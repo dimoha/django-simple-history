@@ -641,7 +641,9 @@ class HistoricalChanges:
             excluded_fields = set()
 
         if included_fields is None:
-            included_fields = {f.name for f in old_history._meta.fields}
+            model_fields = {f.name for f in old_history.instance_type._meta.fields}
+            history_fields = {f.name for f in old_history._meta.fields}
+            included_fields = model_fields & history_fields
 
         fields = set(included_fields).difference(excluded_fields)
 
