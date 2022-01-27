@@ -523,9 +523,13 @@ class HistoricalRecords:
             self.create_historical_record(instance, "-", using=using)
 
     def create_historical_record(self, instance, history_type, using=None):
+        history_user = self.get_history_user(instance)
+
+        if not history_user and getattr(settings, "SIMPLE_HISTORY_ONLY_USER", False):
+            return
+
         using = using if self.use_base_model_db else None
         history_date = getattr(instance, "_history_date", timezone.now())
-        history_user = self.get_history_user(instance)
         history_change_reason = get_change_reason_from_object(instance)
         manager = getattr(instance, self.manager_name)
 
