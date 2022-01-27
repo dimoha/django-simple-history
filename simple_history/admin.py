@@ -47,10 +47,19 @@ class SimpleHistoryAdmin(admin.ModelAdmin):
         pk_name = opts.pk.attname
         history = getattr(model, model._meta.simple_history_manager_attribute)
         object_id = unquote(object_id)
-        action_list = history.filter(**{pk_name: object_id})
+        action_list = history.filter(**{pk_name: object_id}).order_by(
+            'history_date', 'history_id'
+        )
         if not isinstance(history.model.history_user, property):
             # Only select_related when history_user is a ForeignKey (not a property)
             action_list = action_list.select_related("history_user")
+
+        prev_entry = None
+        for list_entry in action_list:
+            delta = list_entry.diff_against(prev_entry) if prev_entry is not None else None
+            setattr(list_entry, "history_delta", delta)
+            prev_entry = list_entry
+
         history_list_display = getattr(self, "history_list_display", [])
         # If no history was found, see whether this object even exists.
         try:
