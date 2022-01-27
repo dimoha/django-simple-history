@@ -59,6 +59,7 @@ class SimpleHistoryAdmin(admin.ModelAdmin):
             delta = list_entry.diff_against(prev_entry) if prev_entry is not None else None
             setattr(list_entry, "history_delta", delta)
             prev_entry = list_entry
+        action_list = sorted(action_list, key=lambda x: x.history_id, reverse=True)
 
         history_list_display = getattr(self, "history_list_display", [])
         # If no history was found, see whether this object even exists.
