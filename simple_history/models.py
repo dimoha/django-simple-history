@@ -654,12 +654,15 @@ class HistoricalChanges:
         current_values = model_to_dict(self, fields=fields)
 
         for field in fields:
-            old_value = old_values[field]
-            current_value = current_values[field]
 
-            if old_value != current_value:
-                changes.append(ModelChange(field, old_value, current_value))
-                changed_fields.append(field)
+            if field in old_values and field in current_values:
+
+                old_value = old_values[field]
+                current_value = current_values[field]
+
+                if old_value != current_value:
+                    changes.append(ModelChange(field, old_value, current_value))
+                    changed_fields.append(field)
 
         return ModelDelta(changes, changed_fields, old_history, self)
 
